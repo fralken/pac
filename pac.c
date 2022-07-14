@@ -33,7 +33,6 @@ duk_context *pac_ctx = NULL;
 static duk_ret_t native_dnsresolve(duk_context *ctx) {
 	const char *hostname;
 	struct addrinfo hints, *addresses, *p;
-	char s[INET_ADDRSTRLEN] = {0};
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_socktype = SOCK_STREAM;
@@ -45,6 +44,7 @@ static duk_ret_t native_dnsresolve(duk_context *ctx) {
 	if (rc != 0) {
 		duk_push_string(ctx, NULL);
 	} else {
+		char s[INET_ADDRSTRLEN] = {0};
 		for(p = addresses; p != NULL; p = p->ai_next) {
 			if (p->ai_family == AF_INET) {
 				getnameinfo(p->ai_addr, p->ai_addrlen, s, sizeof(s), NULL, 0, NI_NUMERICHOST);
@@ -60,12 +60,12 @@ static duk_ret_t native_dnsresolve(duk_context *ctx) {
 
 static duk_ret_t native_myipaddress(duk_context *ctx) {
 	struct ifaddrs *addrs, *p;
-	char s[INET_ADDRSTRLEN] = {0};
 
 	int rc = getifaddrs(&addrs);
 	if (rc != 0) {
 		duk_push_string(ctx, "127.0.0.1");
 	} else {
+		char s[INET_ADDRSTRLEN] = {0};
 		for (p = addrs; p != NULL; p = p->ifa_next) {
 			if (p->ifa_addr && p->ifa_addr->sa_family == AF_INET) {
 				getnameinfo(p->ifa_addr, sizeof(struct sockaddr_in), s, sizeof(s), NULL, 0, NI_NUMERICHOST);
@@ -92,8 +92,10 @@ char * read_file(const char* filename) {
     fseek(fd, 0L, SEEK_SET);	
 
     buf = (char*)calloc(len+1, sizeof(char));	
-    if(buf == NULL)
+    if(buf == NULL) {
+        fclose(fd);
         return NULL;
+    }
 
     fread(buf, sizeof(char), len, fd);
     fclose(fd);
