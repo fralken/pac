@@ -78,7 +78,7 @@ static duk_ret_t native_myipaddress(duk_context *ctx) {
 	return 1;
 }
 
-char * read_file(const char* filename) {
+char *read_file(const char* filename) {
     FILE    *fd;
     char    *buf;
     long    len;
@@ -101,6 +101,41 @@ char * read_file(const char* filename) {
     fclose(fd);
 
     return buf;
+}
+
+// Given a url, counts number of double quotes and backslashes,
+// if it is zero, returns the same url, otherwise allocates a new string
+// with size of original string plus the count, fills the new string with
+// the original string and adds backslash before double quotes and backslashes.
+// Returns the new string.
+// The caller is responsible for freeing the returned string
+// if it is different from the input string.
+char *escape_url(const char *url) {
+    if (!url)
+        return NULL;
+
+    int n = 0;
+    const char *p = url;
+    while (*p) {
+        if (*p == '"' || *p == '\\')
+            n++;
+        p++;
+    }
+    if (n == 0)
+        return (char*)url;
+    int len = p - url + n + 1;
+    char *newurl = (char*)calloc(len, sizeof(char));
+    if (!newurl)
+        return NULL;
+    char *q = newurl;
+    p = url;
+    while (*p) {
+        if (*p == '"' || *p == '\\')
+            *q++ = '\\';
+        *q++ = *p++;
+    }
+    *q = 0;
+    return newurl;
 }
 
 int pac_init(void) {
@@ -144,10 +179,18 @@ const char *pac_find_proxy(const char *url, const char *host) {
     if (!pac_ctx || !url || !host)
         return NULL;
 
-    duk_push_sprintf(pac_ctx, "FindProxyForURL(\"%s\", \"%s\");", url, host);
+    char* escaped_url = escape_url(url);
+    if (!escaped_url)
+        return NULL;
+
+    duk_push_sprintf(pac_ctx, "FindProxyForURL(\"%s\", \"%s\");", escaped_url, host);
     duk_eval(pac_ctx);
     const char* res = duk_get_string(pac_ctx, -1);
     duk_pop(pac_ctx);
+
+    if (escaped_url != url)
+        free(escaped_url);
+
     return res;
 }
 

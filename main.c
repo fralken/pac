@@ -33,7 +33,10 @@ int main(int argc, char *argv[]) {
 		const char *host = argv[2];
 		const char *url = argc > 3 ? argv[3] : "";
 		const char *proxy = pac_find_proxy(url, host);
-		printf("FindProxyForURL:\n    %s\n", proxy);
+		if (proxy)
+			printf("FindProxyForURL:\n    %s\n", proxy);
+		else
+			printf("Error in retrieving proxy for:\n    url: %s\n    host: %s\n", url, host);
 	}
 	pac_cleanup();
 	return 0;
