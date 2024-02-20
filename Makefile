@@ -5,7 +5,7 @@ DUKTAPE_SOURCES = duktape/duktape.c
 
 CC ?= gcc
 CC := $(CC)
-CCOPTS = -Os -pedantic -std=c99 -Wall -Wno-overlength-strings -fstrict-aliasing -fomit-frame-pointer
+CCOPTS = -Os -pedantic -std=c99 -Wall -Wno-overlength-strings -Wno-unused-but-set-variable -fstrict-aliasing -fomit-frame-pointer
 CCLIBS = -lm
 DEFINES =
 

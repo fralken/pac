@@ -194,9 +194,9 @@ const char *pac_find_proxy(const char *url, const char *host) {
     return res;
 }
 
-const char *pac_get_myip(void) {
+char *pac_get_myip(void) {
     duk_eval_string(pac_ctx, "myIpAddress();");
-    const char* res = duk_get_string(pac_ctx, -1);
+    char* res = strdup(duk_get_string(pac_ctx, -1));
     duk_pop(pac_ctx);
     return res;
 }

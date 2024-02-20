@@ -48,7 +48,7 @@ int pac_parse_string(const char *pacstring);      // PAC string to parse
 /// @brief Finds proxy for the given URL and Host.
 /// @param url URL to find proxy for.
 /// @param host Host part of the URL.
-/// @returns proxy string on sucess and NULL on error.
+/// @returns proxy string on sucess and NULL on error. The returned string must not be freed
 ///
 /// Finds proxy for the given URL and Host. This function should be called only
 /// after pac engine has been initialized (using pac_init) and pac
@@ -58,8 +58,8 @@ const char *pac_find_proxy(const char *url,            // URL to find proxy for
 
 /// @returns ip address of the caller
 ///
-/// Returns the ip address of the caller.
-const char *pac_get_myip(void);
+/// Returns the ip address of the caller. The returned string must be freed
+char *pac_get_myip(void);
 
 /// @brief Destroys JavaSctipt context.
 ///

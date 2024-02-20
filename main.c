@@ -20,12 +20,15 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "pac.h"
 
 int main(int argc, char *argv[]) {
 
 	pac_init();
-	printf("myIpAddress:\n    %s\n", pac_get_myip());
+	char* myip = pac_get_myip();
+	printf("myIpAddress:\n    %s\n", myip);
+	free(myip);
 	if (argc >= 2) {
 		pac_parse_file(argv[1]);
 	}
