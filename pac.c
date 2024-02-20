@@ -21,6 +21,7 @@
 
 #include <netdb.h>
 #include <ifaddrs.h>
+#include <arpa/inet.h>
 #include "duktape/duktape.h"
 #include "pac_utils_js.h"
 #include "pac.h"
@@ -68,7 +69,7 @@ static duk_ret_t native_myipaddress(duk_context *ctx) {
 		char s[INET_ADDRSTRLEN] = {0};
 		for (p = addrs; p != NULL; p = p->ifa_next) {
 			if (p->ifa_addr && p->ifa_addr->sa_family == AF_INET) {
-				getnameinfo(p->ifa_addr, sizeof(struct sockaddr_in), s, sizeof(s), NULL, 0, NI_NUMERICHOST);
+				inet_ntop(AF_INET, &((struct sockaddr_in *)p->ifa_addr)->sin_addr, s, sizeof(s));
 			}
 		}
 		duk_push_string(ctx, s);
